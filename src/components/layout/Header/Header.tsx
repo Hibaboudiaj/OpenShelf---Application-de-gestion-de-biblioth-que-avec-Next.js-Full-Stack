@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { BookOpen, CirclePlus } from "lucide-react";
 import styles from "./Header.module.css";
 
@@ -18,14 +19,17 @@ export default function Header() {
           </div>
 
           <nav className={styles.nav}>
-            <button className={`${styles.button} ${styles.active}`}>
+            <Link href="/" className={`${styles.button} ${styles.active}`}>
               Catalogue
-            </button>
+            </Link>
 
-            <button className={`${styles.button} ${styles.addButton}`}>
+            <Link
+              href="/books/create"
+              className={`${styles.button} ${styles.addButton}`}
+            >
               <CirclePlus size={16} />
               <span>Ajouter un livre</span>
-            </button>
+            </Link>
           </nav>
         </div>
       </div>
