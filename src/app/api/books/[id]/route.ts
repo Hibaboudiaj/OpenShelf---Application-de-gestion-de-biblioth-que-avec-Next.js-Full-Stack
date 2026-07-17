@@ -4,33 +4,58 @@ import { connectDB } from "@/src/lib/db";
 import { bookSchema } from "@/src/lib/validators";
 import Book from "@/src/models/Book";
 
+const books = [
+  {
+    _id: "1",
+    title: "Atomic Habits",
+    author: "James Clear",
+    isbn: "9780735211292",
+    category: "Self Development",
+    publicationYear: 2018,
+    description:
+      "A practical guide to building good habits and breaking bad ones.",
+    available: true,
+  },
+  {
+    _id: "2",
+    title: "1984",
+    author: "George Orwell",
+    isbn: "9780451524935",
+    category: "Novel",
+    publicationYear: 1949,
+    description:
+      "A dystopian novel about a totalitarian society controlled by Big Brother.",
+    available: false,
+  },
+  {
+    _id: "3",
+    title: "Clean Code",
+    author: "Robert C. Martin",
+    isbn: "9780132350884",
+    category: "Programming",
+    publicationYear: 2008,
+    description:
+      "A handbook of agile software craftsmanship.",
+    available: true,
+  },
+];
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
-    await connectDB();
+  const { id } = await params;
 
-    const { id } = await params;
+  const book = books.find((book) => book._id === id);
 
-    const book = await Book.findById(id);
-
-    if (!book) {
-      return NextResponse.json(
-        { message: "Book not found." },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json(book, { status: 200 });
-  } catch (error) {
-    console.error(error);
-
+  if (!book) {
     return NextResponse.json(
-      { message: "Internal Server Error." },
-      { status: 500 }
+      { message: "Book not found." },
+      { status: 404 }
     );
   }
+
+  return NextResponse.json(book);
 }
 
 export async function PUT(
