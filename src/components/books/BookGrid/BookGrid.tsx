@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 
 import BookCard from "../BookCard/BookCard";
+import DeleteModal from "../DeleteModal/DeleteModal";
+
 import styles from "./BookGrid.module.css";
 
 import { deleteBook, getBooks } from "@/src/services/book.service";
@@ -10,6 +12,8 @@ import { Book } from "@/src/types/book";
 
 export default function BookList() {
   const [books, setBooks] = useState<Book[]>([]);
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -29,22 +33,31 @@ export default function BookList() {
     }
   }
 
-  async function handleDelete(id: string) {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this book?"
-    );
+  function handleDelete(id: string) {
+    const book = books.find((book) => book._id === id);
 
-    if (!confirmed) return;
+    if (!book) return;
+
+    setSelectedBook(book);
+    setShowDeleteModal(true);
+  }
+
+  async function confirmDelete() {
+    if (!selectedBook) return;
 
     try {
-      await deleteBook(id);
+      await deleteBook(selectedBook._id);
 
       setBooks((prevBooks) =>
-        prevBooks.filter((book) => book._id !== id)
+        prevBooks.filter(
+          (book) => book._id !== selectedBook._id
+        )
       );
+
+      setShowDeleteModal(false);
+      setSelectedBook(null);
     } catch (error) {
       console.error("Failed to delete book:", error);
-      alert("Failed to delete book.");
     }
   }
 
@@ -73,14 +86,27 @@ export default function BookList() {
   }
 
   return (
-    <section className={styles.grid}>
-      {books.map((book) => (
-        <BookCard
-          key={book._id}
-          book={book}
-          onDelete={handleDelete}
+    <>
+      <section className={styles.grid}>
+        {books.map((book) => (
+          <BookCard
+            key={book._id}
+            book={book}
+            onDelete={handleDelete}
+          />
+        ))}
+      </section>
+
+      {showDeleteModal && selectedBook && (
+        <DeleteModal
+          book={selectedBook}
+          onCancel={() => {
+            setShowDeleteModal(false);
+            setSelectedBook(null);
+          }}
+          onConfirm={confirmDelete}
         />
-      ))}
-    </section>
+      )}
+    </>
   );
 }

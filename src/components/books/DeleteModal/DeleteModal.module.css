@@ -1,0 +1,123 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(5, 5, 5, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 999;
+  padding: 20px;
+}
+
+.modal {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border: 1px solid #f1f5f9;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.15);
+  animation: scaleUp 0.2s ease;
+}
+
+.content {
+  display: flex;
+  gap: 18px;
+  padding: 24px;
+}
+
+.iconBox {
+  width: 56px;
+  height: 56px;
+  background: #fff1f2;
+  color: #e11d48;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.text {
+  flex: 1;
+}
+
+.title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.description {
+  margin-top: 10px;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.description strong {
+  color: #111827;
+}
+
+.warning {
+  margin-top: 10px;
+  color: #e11d48;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.cancelBtn,
+.deleteBtn {
+  border: none;
+  outline: none;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.cancelBtn {
+  background: transparent;
+  color: #4b5563;
+}
+
+.cancelBtn:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.deleteBtn {
+  background: #e11d48;
+  color: #fff;
+}
+
+.deleteBtn:hover {
+  background: #be123c;
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
