@@ -107,7 +107,7 @@ export default function BookForm({ id }: BookFormProps) {
         </button>
 
         <h2 className={styles.title}>
-          {id ? "Modifier le livre" : "Ajouter un nouveau livre"}
+          {id ? "Modifier le livre" : "Ajouter un nouveau livre au catalogue"}
         </h2>
       </div>
 
@@ -116,7 +116,7 @@ export default function BookForm({ id }: BookFormProps) {
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.field}>
           <label htmlFor="title">
-            Titre <span>*</span>
+            Titre de l'ouvrage <span>*</span>
           </label>
 
           <input
@@ -125,13 +125,14 @@ export default function BookForm({ id }: BookFormProps) {
             type="text"
             value={formData.title}
             onChange={handleChange}
+            placeholder="Ex : Le Petit Prince"
           />
         </div>
 
         <div className={styles.grid}>
           <div className={styles.field}>
             <label htmlFor="author">
-              Auteur <span>*</span>
+              Auteur de l'ouvrage <span>*</span>
             </label>
 
             <input
@@ -140,12 +141,13 @@ export default function BookForm({ id }: BookFormProps) {
               type="text"
               value={formData.author}
               onChange={handleChange}
+              placeholder="Ex : Antoine de Saint-Exupery"
             />
           </div>
 
           <div className={styles.field}>
             <label htmlFor="isbn">
-              ISBN <span>*</span>
+              Code ISBN <span>*</span>
             </label>
 
             <input
@@ -154,6 +156,7 @@ export default function BookForm({ id }: BookFormProps) {
               type="text"
               value={formData.isbn}
               onChange={handleChange}
+              placeholder="Ex : 987-2345678"
             />
           </div>
         </div>
@@ -182,7 +185,7 @@ export default function BookForm({ id }: BookFormProps) {
           </div>
 
           <div className={styles.field}>
-            <label htmlFor="publicationYear">Année</label>
+            <label htmlFor="publicationYear">Année de publication</label>
 
             <input
               id="publicationYear"
@@ -190,12 +193,13 @@ export default function BookForm({ id }: BookFormProps) {
               type="number"
               value={formData.publicationYear}
               onChange={handleChange}
+              placeholder="Ex : 1967"
             />
           </div>
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="description">Description</label>
+          <label htmlFor="description">Description / Synopsis</label>
 
           <textarea
             id="description"
@@ -203,10 +207,16 @@ export default function BookForm({ id }: BookFormProps) {
             rows={5}
             value={formData.description}
             onChange={handleChange}
+            placeholder="Ecrivez un resume captivant de cet ouvrage (minimum 10 caracters)..."
           />
         </div>
 
         <div className={styles.statusCard}>
+          <div className={styles.statusInfo}>
+            <h4>Statut de l'exemplaire</h4>
+            <p>Indiquez si l'ouvrage est disponible au prêt immédiat.</p>
+          </div>
+
           <label className={styles.switch}>
             <input
               type="checkbox"
@@ -217,7 +227,13 @@ export default function BookForm({ id }: BookFormProps) {
 
             <span className={styles.slider}></span>
 
-            <span className={styles.statusText}>Disponible</span>
+            <span
+              className={`${styles.statusText} ${
+                formData.available ? styles.available : styles.borrowed
+              }`}
+            >
+              {formData.available ? "Disponible" : "Emprunté"}
+            </span>
           </label>
         </div>
 
@@ -233,7 +249,7 @@ export default function BookForm({ id }: BookFormProps) {
           <button type="submit" className={styles.submitButton}>
             <Save size={16} />
 
-            <span>{id ? "Modifier" : "Ajouter"}</span>
+            <span>{id ? "Modifier" : "Ajouter l'ouvrage"}</span>
           </button>
         </div>
       </form>
