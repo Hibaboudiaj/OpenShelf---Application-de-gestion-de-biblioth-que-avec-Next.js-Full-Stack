@@ -4,11 +4,19 @@ import { TriangleAlert } from "lucide-react";
 
 import styles from "./DeleteModal.module.css";
 
+import { Book } from "@/src/types/book";
+
+interface DeleteModalProps {
+  book: Book;
+  onCancel: () => void;
+  onConfirm: () => void;
+}
+
 export default function DeleteModal({
   book,
   onCancel,
   onConfirm,
-}) {
+}: DeleteModalProps) {
   return (
     <div className={styles.overlay}>
       <div className={styles.modal}>
@@ -18,29 +26,22 @@ export default function DeleteModal({
           </div>
 
           <div className={styles.text}>
-            <h3 className={styles.title}>
-              Confirmer la suppression
-            </h3>
+            <h3 className={styles.title}>Confirmer la suppression</h3>
 
             <p className={styles.description}>
               Êtes-vous sûr de vouloir supprimer l'ouvrage{" "}
-              <strong>"{book.title}"</strong> de l'auteur{" "}
-              {book.author} ?
+              <strong>"{book.title}"</strong> de l'auteur {book.author} ?
             </p>
 
             <p className={styles.warning}>
-              Cette action est irréversible et retirera
-              définitivement le livre de la base de données.
+              Cette action est irréversible et retirera définitivement le livre
+              de la base de données.
             </p>
           </div>
         </div>
 
         <div className={styles.footer}>
-          <button
-            type="button"
-            className={styles.cancelBtn}
-            onClick={onCancel}
-          >
+          <button type="button" className={styles.cancelBtn} onClick={onCancel}>
             Annuler
           </button>
 

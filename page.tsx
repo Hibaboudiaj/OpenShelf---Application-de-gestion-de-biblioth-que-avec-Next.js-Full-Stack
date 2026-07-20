@@ -1,6 +1,6 @@
-import ControlPanel from "../components/books/ControlPanel/ControlPanel";
-import Hero from "../components/books/Hero/Hero";
-import BookGrid from "../components/books/BookGrid/BookGrid"
+import ControlPanel from "./src/components/books/ControlPanel/ControlPanel";
+import Hero from "./src/components/books/Hero/Hero";
+import BookGrid from "./src/components/books/BookGrid/BookGrid"
 
 export default function HomePage() {
   return (
