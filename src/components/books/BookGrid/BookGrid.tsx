@@ -7,27 +7,36 @@ import DeleteModal from "../DeleteModal/DeleteModal";
 
 import styles from "./BookGrid.module.css";
 
-import { deleteBook, getBooks } from "@/src/services/book.service";
-import { Book } from "@/src/types/book";
+import {
+  deleteBook,
+  getBooks,
+} from "@/src/services/book.service";
 
-export default function BookList() {
+import { Book } from "@/src/types/book";
+import { useBooks } from "@/src/context/BooksContext";
+
+export default function BookGrid() {
+  const { search, filter } = useBooks();
+
   const [books, setBooks] = useState<Book[]>([]);
-  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedBook, setSelectedBook] =
+    useState<Book | null>(null);
+  const [showDeleteModal, setShowDeleteModal] =
+    useState(false);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    void loadBooks();
+    loadBooks();
   }, []);
 
   async function loadBooks() {
     try {
       const data = await getBooks();
       setBooks(data);
-    } catch (error) {
-      console.error("Failed to load books:", error);
-      setError("Failed to load books.");
+    } catch {
+      setError("Erreur lors du chargement.");
     } finally {
       setLoading(false);
     }
@@ -48,23 +57,42 @@ export default function BookList() {
     try {
       await deleteBook(selectedBook._id);
 
-      setBooks((prevBooks) =>
-        prevBooks.filter(
+      setBooks((prev) =>
+        prev.filter(
           (book) => book._id !== selectedBook._id
         )
       );
 
       setShowDeleteModal(false);
       setSelectedBook(null);
-    } catch (error) {
-      console.error("Failed to delete book:", error);
+    } catch {
+      alert("Erreur lors de la suppression.");
     }
   }
+
+  const filteredBooks = books.filter((book) => {
+    const matchesSearch =
+      book.title
+        .toLowerCase()
+        .includes(search.toLowerCase()) ||
+      book.author
+        .toLowerCase()
+        .includes(search.toLowerCase());
+
+    const matchesFilter =
+      filter === "all" ||
+      (filter === "available" &&
+        book.available) ||
+      (filter === "borrowed" &&
+        !book.available);
+
+    return matchesSearch && matchesFilter;
+  });
 
   if (loading) {
     return (
       <div className={styles.message}>
-        <p>Loading books...</p>
+        Loading...
       </div>
     );
   }
@@ -72,15 +100,15 @@ export default function BookList() {
   if (error) {
     return (
       <div className={styles.message}>
-        <p>{error}</p>
+        {error}
       </div>
     );
   }
 
-  if (books.length === 0) {
+  if (filteredBooks.length === 0) {
     return (
       <div className={styles.message}>
-        <p>No books found.</p>
+        Aucun livre trouvé.
       </div>
     );
   }
@@ -88,7 +116,7 @@ export default function BookList() {
   return (
     <>
       <section className={styles.grid}>
-        {books.map((book) => (
+        {filteredBooks.map((book) => (
           <BookCard
             key={book._id}
             book={book}
@@ -97,16 +125,17 @@ export default function BookList() {
         ))}
       </section>
 
-      {showDeleteModal && selectedBook && (
-        <DeleteModal
-          book={selectedBook}
-          onCancel={() => {
-            setShowDeleteModal(false);
-            setSelectedBook(null);
-          }}
-          onConfirm={confirmDelete}
-        />
-      )}
+      {showDeleteModal &&
+        selectedBook && (
+          <DeleteModal
+            book={selectedBook}
+            onCancel={() => {
+              setShowDeleteModal(false);
+              setSelectedBook(null);
+            }}
+            onConfirm={confirmDelete}
+          />
+        )}
     </>
   );
 }

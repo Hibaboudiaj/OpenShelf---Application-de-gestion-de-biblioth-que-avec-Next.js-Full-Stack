@@ -8,20 +8,28 @@ export async function getBooks(): Promise<Book[]> {
   if (!response.ok) {
     throw new Error("Failed to fetch books.");
   }
+
   return response.json();
 }
 
-export async function getBookById(id: string): Promise<Book> {
+export async function getBookById(
+  id: string
+): Promise<Book> {
   const response = await fetch(`${API_URL}/${id}`);
 
   if (!response.ok) {
-    throw new Error("Failed to fetch the book.");
+    throw new Error("Failed to fetch book.");
   }
 
   return response.json();
 }
 
-export async function createBook(book: Omit<Book, "_id" | "createdAt" | "updatedAt">): Promise<Book> {
+export async function createBook(
+  book: Omit<
+    Book,
+    "_id" | "createdAt" | "updatedAt"
+  >
+): Promise<Book> {
   const response = await fetch(API_URL, {
     method: "POST",
     headers: {
@@ -39,7 +47,10 @@ export async function createBook(book: Omit<Book, "_id" | "createdAt" | "updated
 
 export async function updateBook(
   id: string,
-  book: Omit<Book, "_id" | "createdAt" | "updatedAt">
+  book: Omit<
+    Book,
+    "_id" | "createdAt" | "updatedAt"
+  >
 ): Promise<Book> {
   const response = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
@@ -56,7 +67,9 @@ export async function updateBook(
   return response.json();
 }
 
-export async function deleteBook(id: string): Promise<void> {
+export async function deleteBook(
+  id: string
+): Promise<void> {
   const response = await fetch(`${API_URL}/${id}`, {
     method: "DELETE",
   });

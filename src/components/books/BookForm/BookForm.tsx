@@ -2,11 +2,21 @@
 
 import { ArrowLeft, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { createBook } from "@/src/services/book.service";
+import { useEffect, useState } from "react";
+
+import {
+  createBook,
+  getBookById,
+  updateBook,
+} from "@/src/services/book.service";
+
 import styles from "./BookForm.module.css";
 
-export default function BookForm() {
+interface BookFormProps {
+  id?: string;
+}
+
+export default function BookForm({ id }: BookFormProps) {
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -18,6 +28,32 @@ export default function BookForm() {
     description: "",
     available: true,
   });
+
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (id) {
+      loadBook();
+    }
+  }, [id]);
+
+  async function loadBook() {
+    try {
+      const book = await getBookById(id!);
+
+      setFormData({
+        title: book.title,
+        author: book.author,
+        isbn: book.isbn,
+        category: book.category,
+        publicationYear: book.publicationYear,
+        description: book.description,
+        available: book.available,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   function handleChange(
     e: React.ChangeEvent<
@@ -40,14 +76,25 @@ export default function BookForm() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    try {
-      await createBook(formData);
+    setError("");
 
-      router.push("/");
+    try {
+      if (id) {
+        await updateBook(id, formData);
+
+        router.push(`/books/${id}`);
+      } else {
+        await createBook(formData);
+
+        router.push("/");
+      }
     } catch (error) {
       console.error(error);
+
+      setError("Erreur lors de l'enregistrement du livre.");
     }
   }
+
   return (
     <div className={styles.card}>
       <div className={styles.header}>
@@ -59,15 +106,17 @@ export default function BookForm() {
           <ArrowLeft size={20} />
         </button>
 
-        <h2 className={styles.title}>Ajouter un nouveau livre au catalogue</h2>
+        <h2 className={styles.title}>
+          {id ? "Modifier le livre" : "Ajouter un nouveau livre"}
+        </h2>
       </div>
 
-      <form className={styles.form} onSubmit={handleSubmit}>
-        {/* Title */}
+      {error && <p className={styles.error}>{error}</p>}
 
+      <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.field}>
           <label htmlFor="title">
-            Titre de l'ouvrage <span>*</span>
+            Titre <span>*</span>
           </label>
 
           <input
@@ -76,16 +125,13 @@ export default function BookForm() {
             type="text"
             value={formData.title}
             onChange={handleChange}
-            placeholder="Ex : Le Petit Prince"
           />
         </div>
-
-        {/* Author + ISBN */}
 
         <div className={styles.grid}>
           <div className={styles.field}>
             <label htmlFor="author">
-              Auteur de l'ouvrage <span>*</span>
+              Auteur <span>*</span>
             </label>
 
             <input
@@ -94,13 +140,12 @@ export default function BookForm() {
               type="text"
               value={formData.author}
               onChange={handleChange}
-              placeholder="Ex : Antoine de Saint-Exupéry"
             />
           </div>
 
           <div className={styles.field}>
             <label htmlFor="isbn">
-              Code ISBN <span>*</span>
+              ISBN <span>*</span>
             </label>
 
             <input
@@ -109,18 +154,13 @@ export default function BookForm() {
               type="text"
               value={formData.isbn}
               onChange={handleChange}
-              placeholder="Ex : 978-2070612758"
             />
           </div>
         </div>
 
-        {/* Category + Publication Year */}
-
         <div className={styles.grid}>
           <div className={styles.field}>
-            <label htmlFor="category">
-              Catégorie <span>*</span>
-            </label>
+            <label htmlFor="category">Catégorie</label>
 
             <select
               id="category"
@@ -128,25 +168,21 @@ export default function BookForm() {
               value={formData.category}
               onChange={handleChange}
             >
-              <option value="Littérature">Littérature</option>
-              <option value="Science-Fiction">Science-Fiction</option>
-              <option value="Philosophie">Philosophie</option>
-              <option value="Histoire">Histoire</option>
-              <option value="Poésie">Poésie</option>
-              <option value="Biographie">Biographie</option>
-              <option value="Développement Personnel">
-                Développement Personnel
-              </option>
-              <option value="Jeunesse">Jeunesse</option>
-              <option value="Thrillers & Polars">Thrillers & Polars</option>
-              <option value="Autre">Autre</option>
+              <option>Littérature</option>
+              <option>Science-Fiction</option>
+              <option>Philosophie</option>
+              <option>Histoire</option>
+              <option>Poésie</option>
+              <option>Biographie</option>
+              <option>Développement Personnel</option>
+              <option>Jeunesse</option>
+              <option>Thrillers & Polars</option>
+              <option>Autre</option>
             </select>
           </div>
 
           <div className={styles.field}>
-            <label htmlFor="publicationYear">
-              Année de publication <span>*</span>
-            </label>
+            <label htmlFor="publicationYear">Année</label>
 
             <input
               id="publicationYear"
@@ -158,32 +194,19 @@ export default function BookForm() {
           </div>
         </div>
 
-        {/* Description */}
-
         <div className={styles.field}>
-          <label htmlFor="description">
-            Description / Synopsis <span>*</span>
-          </label>
+          <label htmlFor="description">Description</label>
 
           <textarea
             id="description"
             name="description"
-            rows={4}
+            rows={5}
             value={formData.description}
             onChange={handleChange}
-            placeholder="Écrivez un résumé captivant ou les détails de cet ouvrage..."
           />
         </div>
 
-        {/* Availability */}
-
         <div className={styles.statusCard}>
-          <div>
-            <h4>Statut de l'exemplaire</h4>
-
-            <p>Indiquez si l'ouvrage est disponible au prêt immédiat.</p>
-          </div>
-
           <label className={styles.switch}>
             <input
               type="checkbox"
@@ -198,8 +221,6 @@ export default function BookForm() {
           </label>
         </div>
 
-        {/* Footer */}
-
         <div className={styles.footer}>
           <button
             type="button"
@@ -211,7 +232,8 @@ export default function BookForm() {
 
           <button type="submit" className={styles.submitButton}>
             <Save size={16} />
-            <span>Ajouter l'ouvrage</span>
+
+            <span>{id ? "Modifier" : "Ajouter"}</span>
           </button>
         </div>
       </form>
