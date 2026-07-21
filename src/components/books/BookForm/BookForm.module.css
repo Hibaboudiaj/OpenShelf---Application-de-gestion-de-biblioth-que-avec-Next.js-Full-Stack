@@ -78,7 +78,7 @@
 .field input,
 .field select,
 .field textarea {
-  width: 100%;
+  /* width: 100%; */
   padding: 12px 14px;
   border: 1px solid #dbe4ee;
   border-radius: 16px;

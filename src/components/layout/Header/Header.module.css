@@ -8,9 +8,11 @@
 }
 
 .container {
-  max-width: 1152px;
+  /* max-width: 1152px; */
   margin: 0 auto;
   padding: 0 1rem;
+  padding-right: 34px;
+  padding-left: 31px;
 }
 
 .content {
