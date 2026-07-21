@@ -1,10 +1,30 @@
 import { NextResponse } from "next/server";
 
-import { books } from "@/src/data/books";
+import { connectDB } from "@/src/lib/db";
 import { bookSchema } from "@/src/lib/validators";
+import Book from "@/src/models/Book";
 
 export async function GET() {
-  return NextResponse.json(books);
+  try {
+    await connectDB();
+
+    const books = await Book.find().sort({
+      createdAt: -1,
+    });
+
+    return NextResponse.json(books);
+  } catch (error) {
+    console.error("GET /api/books error:", error);
+
+    return NextResponse.json(
+      {
+        message: "Server error while fetching books.",
+      },
+      {
+        status: 500,
+      },
+    );
+  }
 }
 
 export async function POST(request: Request) {
@@ -13,26 +33,50 @@ export async function POST(request: Request) {
 
     const data = bookSchema.parse(body);
 
-    const newBook = {
-      _id: Date.now().toString(),
-      ...data,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    await connectDB();
 
-    books.push(newBook);
+    const book = await Book.create(data);
 
-    return NextResponse.json(newBook, {
+    return NextResponse.json(book, {
       status: 201,
     });
-  } catch {
+  } catch (error) {
+    console.error("POST /api/books error:", error);
+
+    if (error instanceof Error && error.name === "ZodError") {
+      return NextResponse.json(
+        {
+          message: "Validation error.",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === 11000
+    ) {
+      return NextResponse.json(
+        {
+          message: "This ISBN already exists.",
+        },
+        {
+          status: 409,
+        },
+      );
+    }
+
     return NextResponse.json(
       {
-        message: "Validation Error.",
+        message: "Server error while creating the book.",
       },
       {
-        status: 400,
-      }
+        status: 500,
+      },
     );
   }
 }

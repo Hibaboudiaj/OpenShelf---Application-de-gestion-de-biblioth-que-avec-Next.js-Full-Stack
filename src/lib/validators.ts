@@ -19,15 +19,17 @@ export const bookSchema = z.object({
 
   publicationYear: z
     .number()
-    .int("Publication year must be an integer."),
+    .int("Publication year must be an integer.")
+    .min(1, "Publication year must be valid."),
 
   description: z
     .string()
-    .min(10, "Description must contain at least 10 characters."),
+    .min(
+      10,
+      "Description must contain at least 10 characters.",
+    ),
 
-  available: z
-    .boolean()
-    .optional(),
+  available: z.boolean().optional(),
 });
 
 export type BookInput = z.infer<typeof bookSchema>;
